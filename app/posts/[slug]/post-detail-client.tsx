@@ -7,6 +7,7 @@ import postsService from '@/services/postsService';
 import commentsService from '@/services/commentsService';
 import { useAuth } from '@/context/AuthContext';
 import { ReactionBar } from '@/components/ui/ReactionBar';
+import { formatDate } from '@/lib/date-utils';
 
 interface PostDetailClientProps {
   slug: string;
@@ -27,9 +28,12 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
     const loadPost = async () => {
       try {
         setIsLoading(true);
+        console.log('Loading post with slug:', slug);
         const data = await postsService.getPostBySlug(slug);
+        console.log('Post data received:', data);
         setPost(data);
       } catch (err) {
+        console.error('Error loading post:', err);
         setError(err instanceof Error ? err.message : 'Error cargando el post');
       } finally {
         setIsLoading(false);
@@ -146,13 +150,7 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
                   {post.author?.displayName || post.author?.username}
                 </p>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                  {new Date(post.createdAt).toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDate(post.createdAt, { includeTime: true, format: 'long' })}
                 </p>
               </div>
             </div>
@@ -281,12 +279,7 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
                           {c.author?.displayName || c.author?.username}
                         </p>
                         <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">
-                          {new Date(c.createdAt).toLocaleDateString('es-ES', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {formatDate(c.createdAt, { includeTime: true, format: 'short' })}
                         </p>
                         <p className="text-neutral-800 dark:text-neutral-200 text-sm">
                           {c.content}
