@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -13,37 +13,51 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Cargar tema desde localStorage al montar
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // Función para aplicar tema
+  const applyTheme = useCallback((newTheme: Theme) => {
+    const html = document.documentElement;
     
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    setTheme(initialTheme);
-    applyTheme(initialTheme);
-    setMounted(true);
+    if (newTheme === 'dark') {
+      html.classList.add('dark');
+      html.style.colorScheme = 'dark';
+    } else {
+      html.classList.remove('dark');
+      html.style.colorScheme = 'light';
+    }
+    
+    // Guardar en localStorage
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (e) {
+      console.error('Failed to save theme:', e);
+    }
   }, []);
 
-  const applyTheme = (newTheme: Theme) => {
-    const htmlElement = document.documentElement;
-    if (newTheme === 'dark') {
-      htmlElement.classList.add('dark');
-    } else {
-      htmlElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', newTheme);
-  };
+  // Cargar tema al montar (solo en cliente)
+  useEffect(() => {
+    // Obtener tema guardado o preferencia del sistema
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    
+    // Aplicar tema
+    applyTheme(initialTheme);
+    setTheme(initialTheme);
+    setIsMounted(true);
+  }, [applyTheme]);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    applyTheme(newTheme);
-  };
+  const toggleTheme = useCallback(() => {
+    setTheme((prevTheme) => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
+      return newTheme;
+    });
+  }, [applyTheme]);
 
-  // Evitar hydration mismatch
-  if (!mounted) {
+  // Solo renderizar content con provider cuando está montado
+  if (!isMounted) {
     return <>{children}</>;
   }
 
