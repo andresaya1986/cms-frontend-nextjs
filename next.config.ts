@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           source: '/api/:path*',
-          destination: 'http://localhost:3000/api/:path*',
+          destination: 'http://host.docker.internal:3000/api/:path*',
         },
       ],
     };
