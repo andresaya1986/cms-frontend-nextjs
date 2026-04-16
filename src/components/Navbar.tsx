@@ -36,22 +36,25 @@ export function Navbar() {
           )}
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-8">
             {isAuthenticated ? (
               <>
-                {/* Nav Links */}
+                {/* Nav Links - LinkedIn style */}
                 <Link
                   href="/dashboard"
-                  className="text-neutral-700 hover:text-primary-600 font-medium text-sm transition-colors"
+                  className="text-neutral-700 hover:text-primary-600 font-medium text-sm transition-colors border-b-2 border-transparent hover:border-primary-600"
                 >
-                  Dashboard
+                  🏠 Home
                 </Link>
                 <Link
-                  href="/posts"
-                  className="text-neutral-700 hover:text-primary-600 font-medium text-sm transition-colors"
+                  href="/profile"
+                  className="text-neutral-700 hover:text-primary-600 font-medium text-sm transition-colors border-b-2 border-transparent hover:border-primary-600"
                 >
-                  Posts
+                  👤 Mi Red
                 </Link>
+                <button className="text-neutral-700 hover:text-primary-600 font-medium text-sm transition-colors border-b-2 border-transparent hover:border-primary-600">
+                  💼 Empleos
+                </button>
 
                 {/* Notifications */}
                 <button className="relative p-2 text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors">
@@ -69,28 +72,28 @@ export function Navbar() {
                       {user?.username?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <span className="hidden lg:inline text-sm font-medium text-neutral-900">
-                      Hola, {user?.username}
+                      {user?.username}
                     </span>
                   </button>
 
                   {/* Dropdown Menu */}
                   {profileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-cm-lg border border-neutral-200 py-2 z-50">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-cm-lg border border-neutral-200 py-2 z-50">
+                      <div className="px-4 py-2 border-b border-neutral-200">
+                        <p className="font-semibold text-neutral-900 text-sm">{user?.username}</p>
+                        <p className="text-xs text-neutral-500">{user?.email}</p>
+                      </div>
                       <Link
                         href="/profile"
                         className="block px-4 py-2 text-neutral-700 hover:bg-neutral-50 text-sm"
                         onClick={() => setProfileMenuOpen(false)}
                       >
-                        👤 Mi Perfil
+                        👤 Ver Mi Perfil
                       </Link>
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-neutral-700 hover:bg-neutral-50 text-sm"
-                        onClick={() => setProfileMenuOpen(false)}
-                      >
-                        ⚙️ Configuración
-                      </Link>
-                      <button className="block w-full text-left px-4 py-2 text-neutral-700 hover:bg-neutral-50 text-sm border-t border-neutral-200 mt-2 pt-2">
+                      <button className="block w-full text-left px-4 py-2 text-neutral-700 hover:bg-neutral-50 text-sm">
+                        ⚙️ Configuración y Privacidad
+                      </button>
+                      <button className="block w-full text-left px-4 py-2 text-neutral-700 hover:bg-neutral-50 text-sm">
                         🌙 Tema Oscuro
                       </button>
                       <button
@@ -98,7 +101,7 @@ export function Navbar() {
                           logout();
                           setProfileMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50 text-sm font-medium"
+                        className="block w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50 text-sm font-medium border-t border-neutral-200 mt-2 pt-2"
                       >
                         🚪 Cerrar Sesión
                       </button>
@@ -143,15 +146,18 @@ export function Navbar() {
                   className="block px-4 py-2 text-neutral-700 hover:bg-neutral-50 rounded-lg"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Dashboard
+                  🏠 Home
                 </Link>
                 <Link
-                  href="/posts"
+                  href="/profile"
                   className="block px-4 py-2 text-neutral-700 hover:bg-neutral-50 rounded-lg"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Posts
+                  👤 Mi Red
                 </Link>
+                <button className="block w-full text-left px-4 py-2 text-neutral-700 hover:bg-neutral-50 rounded-lg">
+                  💼 Empleos
+                </button>
                 <Link
                   href="/profile"
                   className="block px-4 py-2 text-neutral-700 hover:bg-neutral-50 rounded-lg"
@@ -159,6 +165,12 @@ export function Navbar() {
                 >
                   Mi Perfil
                 </Link>
+                <button className="block w-full text-left px-4 py-2 text-neutral-700 hover:bg-neutral-50 rounded-lg">
+                  ⚙️ Configuración
+                </button>
+                <button className="block w-full text-left px-4 py-2 text-neutral-700 hover:bg-neutral-50 rounded-lg">
+                  🌙 Tema Oscuro
+                </button>
                 <button
                   onClick={() => {
                     logout();
