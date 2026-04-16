@@ -25,25 +25,25 @@ export function TrendingCard({ topics = [] }: TrendingCardProps) {
   const displayTopics = topics.length > 0 ? topics : defaultTopics;
 
   return (
-    <div className="bg-white rounded-xl shadow-cm border border-neutral-200 overflow-hidden sticky top-20">
+    <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-cm border border-neutral-200 dark:border-neutral-800 overflow-hidden sticky top-20">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-neutral-200">
-        <h3 className="font-bold text-lg text-neutral-900">🔥 Tendencias</h3>
-        <p className="text-xs text-neutral-600">Lo que está pasando ahora</p>
+      <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800">
+        <h3 className="font-bold text-lg text-neutral-900 dark:text-neutral-100">🔥 Tendencias</h3>
+        <p className="text-xs text-neutral-600 dark:text-neutral-400">Lo que está pasando ahora</p>
       </div>
 
       {/* Topics */}
-      <div className="divide-y divide-neutral-200">
+      <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
         {displayTopics.map((topic) => (
           <button
             key={topic.id}
-            className="w-full px-6 py-3 hover:bg-neutral-50 transition-colors text-left group"
+            className="w-full px-6 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors text-left group"
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-xs text-neutral-600 group-hover:text-primary-600">Tema Trending</p>
-                <p className="font-bold text-neutral-900">#{topic.name}</p>
-                <p className="text-sm text-neutral-600">{topic.count.toLocaleString()} posts</p>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400">Tema Trending</p>
+                <p className="font-bold text-neutral-900 dark:text-neutral-100">#{topic.name}</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">{topic.count.toLocaleString()} posts</p>
               </div>
               <span
                 className={`text-lg ${
@@ -60,8 +60,8 @@ export function TrendingCard({ topics = [] }: TrendingCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-3 bg-neutral-50 border-t border-neutral-200">
-        <button className="text-primary-600 hover:text-primary-700 font-medium text-sm">
+      <div className="px-6 py-3 bg-neutral-50 dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-800">
+        <button className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
           Ver todas las tendencias →
         </button>
       </div>

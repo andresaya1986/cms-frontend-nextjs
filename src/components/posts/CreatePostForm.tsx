@@ -90,23 +90,23 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-8 max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6">Crear Nuevo Post</h2>
+    <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-md p-8 max-w-4xl mx-auto border border-neutral-200 dark:border-neutral-800">
+      <h2 className="text-3xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Crear Nuevo Post</h2>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-6">
           {error}
         </div>
       )}
 
       {hookError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-6">
           {hookError}
         </div>
       )}
 
       {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+        <div className="bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200 px-4 py-3 rounded mb-6">
           ✅ Post creado exitosamente. Redirigiendo...
         </div>
       )}
@@ -114,14 +114,14 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Título */}
         <div>
-          <label className="block text-sm font-medium mb-2">Título *</label>
+          <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Título *</label>
           <input
             type="text"
             name="title"
             value={formData.title}
             onChange={handleChange}
             placeholder="Título del post"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
             disabled={isLoading}
           />
         </div>
@@ -129,12 +129,12 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
         {/* Tipo de Post */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Tipo</label>
+            <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Tipo</label>
             <select
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             >
               <option value="ARTICLE">Artículo</option>
@@ -145,12 +145,12 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Estado</label>
+            <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Estado</label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             >
               <option value="DRAFT">Borrador</option>
@@ -159,12 +159,12 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Visibilidad</label>
+            <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Visibilidad</label>
             <select
               name="visibility"
               value={formData.visibility}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             >
               <option value="PUBLIC">Público</option>
@@ -176,31 +176,31 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
 
         {/* Excerpt */}
         <div>
-          <label className="block text-sm font-medium mb-2">Resumen (opcional)</label>
+          <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Resumen (opcional)</label>
           <textarea
             name="excerpt"
             value={formData.excerpt}
             onChange={handleChange}
             placeholder="Resumen corto del post"
             rows={2}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
             disabled={isLoading}
           />
         </div>
 
         {/* Contenido */}
         <div>
-          <label className="block text-sm font-medium mb-2">Contenido *</label>
+          <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Contenido *</label>
           <textarea
             name="content"
             value={formData.content}
             onChange={handleChange}
             placeholder="Contenido del post..."
             rows={12}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+            className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono text-sm"
             disabled={isLoading}
           />
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
             Puedes usar Markdown para formatear el contenido
           </p>
         </div>
@@ -208,27 +208,27 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
         {/* Meta información */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Meta Título (opcional)</label>
+            <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Meta Título (opcional)</label>
             <input
               type="text"
               name="metaTitle"
               value={formData.metaTitle}
               onChange={handleChange}
               placeholder="Título para SEO"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Meta Descripción (opcional)</label>
+            <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Meta Descripción (opcional)</label>
             <input
               type="text"
               name="metaDescription"
               value={formData.metaDescription}
               onChange={handleChange}
               placeholder="Descripción para SEO"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             />
           </div>
@@ -237,46 +237,46 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
         {/* Tags y categorías */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Tags (opcional)</label>
+            <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Tags (opcional)</label>
             <input
               type="text"
               name="tags"
               value={formData.tags}
               onChange={handleChange}
               placeholder="Separadas por comas: tag1, tag2, tag3"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Categorías (opcional)</label>
+            <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Categorías (opcional)</label>
             <input
               type="text"
               name="categories"
               value={formData.categories}
               onChange={handleChange}
               placeholder="Separadas por comas: cat1, cat2"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             />
           </div>
         </div>
 
         {/* Botones */}
-        <div className="flex gap-4 justify-end pt-6 border-t">
+        <div className="flex gap-4 justify-end pt-6 border-t border-neutral-200 dark:border-neutral-700">
           <button
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="px-6 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            className="px-6 py-2 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 transition-colors"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-semibold"
+            className="px-6 py-2 bg-primary-600 dark:bg-primary-600 hover:bg-primary-700 dark:hover:bg-primary-700 text-white rounded-lg disabled:opacity-50 font-semibold transition-colors"
           >
             {isLoading ? 'Creando...' : 'Crear Post'}
           </button>

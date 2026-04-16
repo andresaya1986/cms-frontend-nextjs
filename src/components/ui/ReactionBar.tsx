@@ -36,9 +36,9 @@ export function ReactionBar({
   const currentReactionData = reactions.find((r) => r.type === currentReaction);
 
   return (
-    <div className="border-t border-neutral-200">
+    <div className="border-t border-neutral-200 dark:border-neutral-700">
       {/* Stats Row */}
-      <div className="flex justify-between px-4 py-2 text-xs text-neutral-600">
+      <div className="flex justify-between px-4 py-2 text-xs text-neutral-600 dark:text-neutral-400">
         <span>{likeCount > 0 ? `${likeCount} reacciones` : ''}</span>
         <div className="flex gap-4">
           <span>{commentCount > 0 ? `${commentCount} comentarios` : ''}</span>
@@ -62,8 +62,8 @@ export function ReactionBar({
             className={`w-full py-2 flex items-center justify-center gap-2 font-medium transition-colors
               ${
                 currentReaction
-                  ? `${currentReactionData?.color} bg-neutral-50`
-                  : 'text-neutral-600 hover:bg-neutral-50'
+                  ? `${currentReactionData?.color} bg-neutral-50 dark:bg-neutral-800`
+                  : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800'
               }`}
           >
             {currentReaction ? currentReactionData?.emoji : '👍'}
@@ -72,7 +72,7 @@ export function ReactionBar({
 
           {/* Reactions Popover */}
           {showReactions && (
-            <div className="absolute -top-14 left-0 bg-white rounded-full shadow-cm p-2 flex gap-2 z-50">
+            <div className="absolute -top-14 left-0 bg-white dark:bg-neutral-800 rounded-full shadow-cm p-2 flex gap-2 z-50 border border-neutral-200 dark:border-neutral-700">
               {reactions.map((reaction) => (
                 <button
                   key={reaction.type}
@@ -94,7 +94,7 @@ export function ReactionBar({
         {/* Comment Button */}
         <button
           onClick={onComment}
-          className="flex-1 py-2 flex items-center justify-center gap-2 font-medium text-neutral-600 hover:bg-neutral-50 transition-colors"
+          className="flex-1 py-2 flex items-center justify-center gap-2 font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
         >
           💬
           <span className="hidden sm:inline">Comentar</span>

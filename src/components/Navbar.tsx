@@ -65,12 +65,20 @@ export function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                    className="flex items-center gap-2 p-1 hover:bg-neutral-100 rounded-lg transition-colors"
+                    className="flex items-center gap-2 p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-300 to-primary-600 flex items-center justify-center text-white text-sm font-bold">
-                      {user?.username?.charAt(0).toUpperCase() || 'U'}
-                    </div>
-                    <span className="hidden lg:inline text-sm font-medium text-neutral-900">
+                    {user?.avatarUrl || user?.avatar ? (
+                      <img
+                        src={user.avatarUrl || user.avatar}
+                        alt={user.username}
+                        className="w-8 h-8 rounded-full object-cover border border-neutral-200 dark:border-neutral-700"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-300 to-primary-600 flex items-center justify-center text-white text-sm font-bold border border-neutral-200 dark:border-neutral-700">
+                        {user?.username?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    <span className="hidden lg:inline text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {user?.username}
                     </span>
                   </button>

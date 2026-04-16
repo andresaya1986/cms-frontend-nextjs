@@ -31,25 +31,33 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
 
   return (
     <div
-      className="bg-white rounded-xl shadow-cm hover:shadow-cm-lg transition-shadow mb-4 overflow-hidden border border-neutral-200"
+      className="bg-white dark:bg-neutral-900 rounded-xl shadow-cm hover:shadow-cm-lg transition-shadow mb-4 overflow-hidden border border-neutral-200 dark:border-neutral-800"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       {/* Header */}
       <div className="px-6 py-4 flex items-start justify-between">
         <div className="flex items-start gap-4 flex-1">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg">
-            {post.author?.username?.charAt(0).toUpperCase() || 'U'}
-          </div>
+          {post.author?.avatarUrl || post.author?.avatar ? (
+            <img
+              src={post.author.avatarUrl || post.author.avatar}
+              alt={post.author?.username}
+              className="w-12 h-12 rounded-full object-cover border border-neutral-200 dark:border-neutral-700"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg border border-neutral-200 dark:border-neutral-700">
+              {post.author?.username?.charAt(0).toUpperCase() || 'U'}
+            </div>
+          )}
 
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
-              <h3 className="font-bold text-neutral-900">
+              <h3 className="font-bold text-neutral-900 dark:text-neutral-100">
                 {post.author?.displayName || post.author?.username || 'Anónimo'}
               </h3>
-              <span className="text-sm text-neutral-600">@{post.author?.username}</span>
+              <span className="text-sm text-neutral-600 dark:text-neutral-400">@{post.author?.username}</span>
             </div>
-            <p className="text-xs text-neutral-500">{formatDate(post.createdAt)}</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">{formatDate(post.createdAt)}</p>
           </div>
         </div>
 
@@ -61,7 +69,7 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
                 onDelete?.(post.id);
               }
             }}
-            className="text-neutral-400 hover:text-rose-600 transition-colors p-1"
+            className="text-neutral-400 dark:text-neutral-600 hover:text-rose-600 dark:hover:text-rose-500 transition-colors p-1"
             title="Más opciones"
           >
             ⋯
@@ -74,10 +82,10 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
         <span
           className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
             post.status === 'PUBLISHED'
-              ? 'bg-accent-100 text-accent-700'
+              ? 'bg-accent-100 dark:bg-accent-900 text-accent-700 dark:text-accent-300'
               : post.status === 'DRAFT'
-              ? 'bg-amber-100 text-amber-700'
-              : 'bg-neutral-100 text-neutral-700'
+              ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300'
+              : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
           }`}
         >
           {post.status === 'PUBLISHED' && '✓ Publicado'}
@@ -89,23 +97,23 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
       {/* Content */}
       <div className="px-6 pb-4">
         <Link href={`/posts/${post.slug}`}>
-          <h2 className="text-xl font-bold text-neutral-900 hover:text-primary-600 transition-colors mb-2 cursor-pointer">
+          <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-2 cursor-pointer">
             {post.title}
           </h2>
         </Link>
 
-        {post.excerpt && <p className="text-neutral-600 text-sm line-clamp-2 mb-3">{post.excerpt}</p>}
+        {post.excerpt && <p className="text-neutral-600 dark:text-neutral-400 text-sm line-clamp-2 mb-3">{post.excerpt}</p>}
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">
             {post.tags.slice(0, 3).map((tag, idx) => (
-              <span key={idx} className="text-xs bg-neutral-100 text-neutral-700 px-2 py-1 rounded-full">
+              <span key={idx} className="text-xs bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 px-2 py-1 rounded-full">
                 {'#'}{typeof tag === 'string' ? tag : (tag as any)?.name || 'tag'}
               </span>
             ))}
             {post.tags.length > 3 && (
-              <span className="text-xs bg-neutral-100 text-neutral-700 px-2 py-1 rounded-full">
+              <span className="text-xs bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 px-2 py-1 rounded-full">
                 +{post.tags.length - 3}
               </span>
             )}
@@ -114,7 +122,7 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
       </div>
 
       {/* Stats */}
-      <div className="px-6 py-3 bg-neutral-50 flex justify-between text-sm text-neutral-600 border-t border-neutral-100">
+      <div className="px-6 py-3 bg-neutral-50 dark:bg-neutral-800 flex justify-between text-sm text-neutral-600 dark:text-neutral-400 border-t border-neutral-100 dark:border-neutral-700">
         <span>👁️ {post.viewCount} vistas</span>
         <span>❤️ {post.likeCount} reacciones</span>
         <span>💬 {post.commentCount} comentarios</span>
@@ -130,8 +138,8 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
 
       {/* Comments Section */}
       {showComments && (
-        <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200">
-          <p className="text-neutral-600 text-sm">💬 {post.commentCount} comentarios</p>
+        <div className="px-6 py-4 bg-neutral-50 dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700">
+          <p className="text-neutral-600 dark:text-neutral-400 text-sm">💬 {post.commentCount} comentarios</p>
           {/* TODO: Implementar lista de comentarios */}
         </div>
       )}
