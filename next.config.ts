@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export', // <--- ESTO ES LO MÁS IMPORTANTE
+  // Remover output: 'export' permite usar rutas dinámicas con servidor Next.js
   // Si usas imágenes de Next.js (<Image />), añade esto también:
   images: {
     unoptimized: true,
