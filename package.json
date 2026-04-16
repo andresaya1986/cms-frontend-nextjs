@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "docker:build": "docker build -t intranet-frontend .",
-    "docker:run": "docker run -d -p 4000:80 --name front-container intranet-frontend",
-    "docker:stop": "docker rm -f front-container"
+    "docker:run": "docker rm -f intranet-frontend-container || true && docker run -d -p 4000:80 --name intranet-frontend-container intranet-frontend",
+    "docker:stop": "docker rm -f intranet-frontend-container || true",
+    "docker:restart": "npm run docker:build && npm run docker:run"
   },
   "dependencies": {
     "axios": "^1.15.0",
