@@ -20,24 +20,54 @@ export function usePosts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [pageSize] = useState(10);
 
-  const fetchPosts = useCallback(async (page = 1, pageSize = 10) => {
+  const fetchPosts = useCallback(async (page = 1, newPageSize = 10) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await postsService.getPostsList(page, pageSize);
+      const data = await postsService.getPostsList(page, newPageSize);
       const postsList = data.data || data;
       // Transformar todos los posts
       const transformedPosts = Array.isArray(postsList) 
         ? postsList.map(transformPost)
         : [transformPost(postsList)];
       setPosts(transformedPosts);
+      setCurrentPage(page);
+      // Determinar si hay más posts
+      setHasMore(transformedPosts.length === newPageSize);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error fetching posts');
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  // Cargar más posts (para infinite scroll)
+  const loadMorePosts = useCallback(async () => {
+    if (!hasMore || isLoading) return;
+    
+    setIsLoading(true);
+    setError(null);
+    try {
+      const nextPage = currentPage + 1;
+      const data = await postsService.getPostsList(nextPage, pageSize);
+      const postsList = data.data || data;
+      const transformedPosts = Array.isArray(postsList)
+        ? postsList.map(transformPost)
+        : [transformPost(postsList)];
+      
+      setPosts((prev) => [...prev, ...transformedPosts]);
+      setCurrentPage(nextPage);
+      setHasMore(transformedPosts.length === pageSize);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error loading more posts');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, hasMore, isLoading, pageSize]);
 
   const getPost = useCallback(async (slug: string) => {
     setIsLoading(true);
@@ -107,5 +137,8 @@ export function usePosts() {
     createPost,
     updatePost,
     deletePost,
+    loadMorePosts,
+    hasMore,
+    currentPage,
   };
 }
