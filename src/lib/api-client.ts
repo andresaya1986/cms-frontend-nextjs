@@ -24,9 +24,14 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // No autenticado, limpiar token
+      // No autenticado, limpiar sesión completamente
       localStorage.removeItem('auth_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user_data');
+      // Notificar al contexto que la sesión se perdió
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('session-lost'));
+      }
     }
     return Promise.reject(error);
   }
@@ -75,8 +80,8 @@ const socialEndpoints = {
 
 // Endpoints de Comentarios
 const commentsEndpoints = {
-  list: (postId: string) => `/${API_VERSION}/comments/${postId}`,
-  create: (postId: string) => `/${API_VERSION}/comments/${postId}`,
+  list: `/${API_VERSION}/comments`,
+  create: `/${API_VERSION}/comments`,
   update: (commentId: string) => `/${API_VERSION}/comments/${commentId}`,
   delete: (commentId: string) => `/${API_VERSION}/comments/${commentId}`,
 };

@@ -99,8 +99,12 @@ export interface Post {
   tags?: string[];
   categories?: string[];
   viewCount: number;
-  likeCount: number;
-  commentCount: number;
+  likeCount?: number;
+  likesCount?: number;
+  commentCount?: number;
+  commentsCount?: number;
+  sharesCount?: number;
+  bookmarksCount?: number;
   isLiked?: boolean;
   createdAt: string;
   updatedAt: string;

@@ -1,7 +1,6 @@
 'use client';
 
 import { SidebarProfile } from '@/components/ui/SidebarProfile';
-import { TrendingCard } from '@/components/ui/TrendingCard';
 import { CreatePostForm } from '@/components/posts/CreatePostForm';
 import { PostList } from '@/components/posts/PostList';
 import { usePosts } from '@/hooks/usePosts';
@@ -45,8 +44,8 @@ export default function DashboardPage() {
   return (
     <div className="pt-20 pb-8 bg-white dark:bg-neutral-950 min-h-screen">
       <div className="max-w-7xl mx-auto px-3">
-        {/* Grid responsivo: 1 col mobile, 4 col md/lg */}
-        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
+        {/* Grid responsivo: 1 col mobile, 3 col md/lg (sin tendencias) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
           
           {/* LEFT SIDEBAR - Perfil Usuario (hidden en mobile) */}
           <div className="hidden md:block">
@@ -65,7 +64,7 @@ export default function DashboardPage() {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white font-semibold border-2 border-slate-600 shadow-sm">
                     {user?.username?.charAt(0).toUpperCase() || 'U'}
                   </div>
                 )}
@@ -97,17 +96,14 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* RIGHT SIDEBAR - Tendencias (hidden en md, visible en lg) */}
-          <div className="hidden lg:block">
-            <TrendingCard />
-          </div>
+          {/* RIGHT SIDEBAR - Tendencias REMOVIDA */}
         </div>
       </div>
 
       {/* Modal crear post */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-neutral-900 rounded-lg w-full max-w-[500px] max-h-[90vh] overflow-y-auto border border-neutral-200 dark:border-neutral-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white dark:bg-neutral-900 rounded-lg w-full max-w-[600px] max-h-[95vh] overflow-y-auto border border-neutral-200 dark:border-neutral-700">
             <div className="flex justify-between items-center p-4 border-b border-neutral-200 dark:border-neutral-700">
               <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Crear Post</h2>
               <button

@@ -17,9 +17,9 @@ export default function AuthenticatedLayout({
     console.log('AuthenticatedLayout effect: isLoading=%s, isAuthenticated=%s', isLoading, isAuthenticated);
     
     if (!isLoading && !isAuthenticated) {
-      console.log('Not authenticated, redirecting to login');
+      console.log('🔐 Sesión perdida, redirigiendo al home');
       // Usar replace() para remover la ruta actual del historial
-      router.replace('/auth/login');
+      router.replace('/');
     }
   }, [isAuthenticated, isLoading, router]);
 

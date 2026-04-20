@@ -1,9 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Post } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 import { ReactionBar } from './ReactionBar';
+import { CommentForm } from '@/components/posts/CommentForm';
+import { CommentsList } from '@/components/posts/CommentsList';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface PostCardProps {
   post: Post;
@@ -12,8 +16,24 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, onDelete, onReact }: PostCardProps) {
+  const { user } = useAuth();
+  const router = useRouter();
   const [showComments, setShowComments] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [commentRefreshKey, setCommentRefreshKey] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleCommentCreated = () => {
+    setCommentRefreshKey((prev) => prev + 1);
+  };
+
+  // Verificar si el usuario puede editar/eliminar
+  const canEdit = user && (user.id === post.author?.id || user.role === 'ADMIN');
+
+  // Normalizar los nombres de los campos (API usa likesCount, nosotros usamos likeCount)
+  const likeCount = post.likeCount ?? post.likesCount ?? 0;
+  const commentCount = post.commentCount ?? post.commentsCount ?? 0;
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -27,6 +47,18 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
     if (days < 7) return `Hace ${days}d`;
 
     return d.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+  };
+
+  const handleEdit = () => {
+    router.push(`/posts/${post.slug}/edit`);
+    setShowMenu(false);
+  };
+
+  const handleDelete = () => {
+    if (confirm('¿Eliminar este post?')) {
+      onDelete?.(post.id);
+      setShowMenu(false);
+    }
   };
 
   return (
@@ -45,7 +77,7 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
               className="w-12 h-12 rounded-full object-cover border border-neutral-200 dark:border-neutral-700"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg border border-neutral-200 dark:border-neutral-700">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white font-bold text-lg border-2 border-slate-600 dark:border-slate-700 shadow-md">
               {post.author?.username?.charAt(0).toUpperCase() || 'U'}
             </div>
           )}
@@ -62,18 +94,34 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
         </div>
 
         {/* Menu */}
-        {isHovering && (
-          <button
-            onClick={() => {
-              if (confirm('¿Eliminar este post?')) {
-                onDelete?.(post.id);
-              }
-            }}
-            className="text-neutral-400 dark:text-neutral-600 hover:text-rose-600 dark:hover:text-rose-500 transition-colors p-1"
-            title="Más opciones"
-          >
-            ⋯
-          </button>
+        {isHovering && canEdit && (
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="text-neutral-400 dark:text-neutral-600 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors p-1"
+              title="Más opciones"
+            >
+              ⋯
+            </button>
+
+            {/* Dropdown Menu */}
+            {showMenu && (
+              <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 z-50">
+                <button
+                  onClick={handleEdit}
+                  className="w-full text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors first:rounded-t-lg flex items-center gap-2 text-neutral-800 dark:text-neutral-200"
+                >
+                  ✏️ Editar
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 transition-colors last:rounded-b-lg flex items-center gap-2 text-red-600 dark:text-red-400"
+                >
+                  🗑️ Eliminar
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -121,26 +169,25 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
         )}
       </div>
 
-      {/* Stats */}
-      <div className="px-6 py-3 bg-neutral-50 dark:bg-neutral-800 flex justify-between text-sm text-neutral-600 dark:text-neutral-400 border-t border-neutral-100 dark:border-neutral-700">
-        <span>👁️ {post.viewCount} vistas</span>
-        <span>❤️ {post.likeCount} reacciones</span>
-        <span>💬 {post.commentCount} comentarios</span>
-      </div>
-
-      {/* Reaction Bar */}
+      {/* Single Unified Reaction Bar (like LinkedIn) */}
       <ReactionBar
-        likeCount={post.likeCount}
-        commentCount={post.commentCount}
-        onReact={(reaction) => onReact?.(post.id, reaction)}
+        postId={post.id}
+        likeCount={likeCount}
+        commentCount={commentCount}
+        viewCount={post.viewCount}
         onComment={() => setShowComments(!showComments)}
       />
 
       {/* Comments Section */}
       {showComments && (
         <div className="px-6 py-4 bg-neutral-50 dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700">
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm">💬 {post.commentCount} comentarios</p>
-          {/* TODO: Implementar lista de comentarios */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">💬 Comentarios</h3>
+            <CommentForm postId={post.id} onCommentCreated={handleCommentCreated} />
+            <div className="mt-4 bg-white dark:bg-neutral-700 rounded-lg p-4">
+              <CommentsList postId={post.id} refreshTrigger={commentRefreshKey} />
+            </div>
+          </div>
         </div>
       )}
     </div>

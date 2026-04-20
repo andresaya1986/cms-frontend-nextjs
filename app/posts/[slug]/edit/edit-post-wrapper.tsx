@@ -1,31 +1,51 @@
 'use client';
 
 import { useState } from 'react';
-import { usePosts } from '@/hooks/usePosts';
-import { PostType, PostStatus, PostVisibility } from '@/types';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { Post, UpdatePostPayload } from '@/types';
+import postsService from '@/services/postsService';
+import Link from 'next/link';
 
-interface CreatePostFormProps {
-  onSuccess?: () => void;
-  onCancel?: () => void;
+interface EditPostClientProps {
+  post: Post;
 }
 
-export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
-  const { createPost, isLoading, error: hookError } = usePosts();
+export function EditPostClient({ post }: EditPostClientProps) {
+  const router = useRouter();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    excerpt: '',
-    featuredImage: '',
-    type: 'ARTICLE' as PostType,
-    status: 'DRAFT' as PostStatus,
-    visibility: 'PUBLIC' as PostVisibility,
-    metaTitle: '',
-    metaDescription: '',
-    tags: '',
-    categories: '',
+    title: post.title,
+    content: post.content,
+    excerpt: post.excerpt || '',
+    type: post.type as any,
+    status: post.status as any,
+    visibility: post.visibility as any,
+    metaTitle: post.metaTitle || '',
+    metaDescription: post.metaDescription || '',
+    coverImage: post.coverImage || '',
+    tags: post.tags?.join(', ') || '',
+    categories: post.categories?.join(', ') || '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Verificar permisos
+  const canEdit = user && (user.id === post.author?.id || user.role === 'ADMIN');
+  if (!canEdit) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Acceso Denegado</h1>
+          <p className="mb-6">No tienes permisos para editar este post.</p>
+          <Link href="/dashboard" className="text-primary-600 hover:underline">
+            Volver al dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -38,63 +58,59 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
     e.preventDefault();
     setError('');
     setSuccess(false);
+    setIsLoading(true);
 
     if (!formData.title.trim()) {
       setError('El título es requerido');
+      setIsLoading(false);
       return;
     }
 
     if (!formData.content.trim()) {
       setError('El contenido es requerido');
+      setIsLoading(false);
       return;
     }
 
     try {
-      // Construir el payload con todos los campos que espera el backend
-      const payload = {
+      const payload: UpdatePostPayload = {
         title: formData.title,
         content: formData.content,
         excerpt: formData.excerpt || undefined,
-        featuredImage: formData.featuredImage || undefined,
         type: formData.type,
         status: formData.status,
         visibility: formData.visibility,
         metaTitle: formData.metaTitle || undefined,
         metaDescription: formData.metaDescription || undefined,
+        coverImage: formData.coverImage || undefined,
         tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
         categories: formData.categories ? formData.categories.split(',').map(c => c.trim()).filter(Boolean) : undefined,
       };
 
-      const newPost = await createPost(payload);
+      const updatedPost = await postsService.updatePost(post.id, payload);
+      setSuccess(true);
 
-      if (newPost) {
-        setSuccess(true);
-        setFormData({
-          title: '',
-          content: '',
-          excerpt: '',
-          featuredImage: '',
-          type: 'ARTICLE',
-          status: 'DRAFT',
-          visibility: 'PUBLIC',
-          metaTitle: '',
-          metaDescription: '',
-          tags: '',
-          categories: '',
-        });
-
-        setTimeout(() => {
-          onSuccess?.();
-        }, 1500);
-      }
+      setTimeout(() => {
+        // Usar el slug del post actualizado si existe, sino usar el slug anterior
+        const redirectSlug = updatedPost?.slug || post.slug;
+        router.push(`/posts/${redirectSlug}`);
+      }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error creando el post');
+      setError(err instanceof Error ? err.message : 'Error actualizando el post');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-md p-8 max-w-4xl mx-auto border border-neutral-200 dark:border-neutral-800">
-      <h2 className="text-3xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Crear Nuevo Post</h2>
+    <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-md p-8 max-w-4xl mx-auto border border-neutral-200 dark:border-neutral-800 my-8">
+      <div className="mb-6">
+        <Link href={`/posts/${post.slug}`} className="text-primary-600 hover:text-primary-700 font-medium">
+          ← Volver al post
+        </Link>
+      </div>
+
+      <h2 className="text-3xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Editar Post</h2>
 
       {error && (
         <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-6">
@@ -102,15 +118,9 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
         </div>
       )}
 
-      {hookError && (
-        <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-6">
-          {hookError}
-        </div>
-      )}
-
       {success && (
         <div className="bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200 px-4 py-3 rounded mb-6">
-          ✅ Post creado exitosamente. Redirigiendo...
+          ✅ Post actualizado exitosamente. Redirigiendo...
         </div>
       )}
 
@@ -129,7 +139,7 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
           />
         </div>
 
-        {/* Tipo de Post */}
+        {/* Tipo, Estado, Visibilidad */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Tipo</label>
@@ -183,16 +193,16 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
             <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Imagen (opcional)</label>
             <input
               type="url"
-              name="featuredImage"
-              value={formData.featuredImage}
+              name="coverImage"
+              value={formData.coverImage}
               onChange={handleChange}
               placeholder="URL de la imagen"
               className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isLoading}
             />
-            {formData.featuredImage && (
+            {formData.coverImage && (
               <div className="mt-2 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-700">
-                <img src={formData.featuredImage} alt="Preview" className="w-full h-32 object-cover" onError={() => {}} />
+                <img src={formData.coverImage} alt="Preview" className="w-full h-32 object-cover" />
               </div>
             )}
           </div>
@@ -287,14 +297,12 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
 
         {/* Botones */}
         <div className="flex gap-4 justify-end pt-6 border-t border-neutral-200 dark:border-neutral-700">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isLoading}
+          <Link
+            href={`/posts/${post.slug}`}
             className="px-6 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
           >
             Cancelar
-          </button>
+          </Link>
           <button
             type="submit"
             disabled={isLoading}
@@ -303,10 +311,10 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Publicando...
+                Guardando...
               </span>
             ) : (
-              '✓ Publicar Post'
+              '✓ Guardar Cambios'
             )}
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { PostDetailClient } from './post-detail-wrapper';
+import { EditPostClient } from './edit-post-wrapper';
 
 // Fetch post data on the server
 async function getPost(slug: string) {
@@ -16,13 +16,13 @@ async function getPost(slug: string) {
   }
 }
 
-interface PostDetailPageProps {
+interface EditPostPageProps {
   params: Promise<{
     slug: string;
   }>;
 }
 
-export default async function PostDetailPage({ params }: PostDetailPageProps) {
+export default async function EditPostPage({ params }: EditPostPageProps) {
   const { slug } = await params;
   const post = await getPost(slug);
   
@@ -30,5 +30,5 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     notFound();
   }
 
-  return <PostDetailClient post={post} />;
+  return <EditPostClient post={post} />;
 }

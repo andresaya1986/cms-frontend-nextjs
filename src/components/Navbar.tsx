@@ -12,15 +12,15 @@ export function Navbar() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-40 bg-white dark:bg-neutral-900 shadow-cm border-b border-neutral-200 dark:border-neutral-800">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <nav className="sticky top-0 z-40 bg-gradient-to-r from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-800 shadow-md border-b border-neutral-200 dark:border-neutral-700 backdrop-blur-sm">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold">
-              💼
+          <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold text-lg group-hover:shadow-lg transition-shadow">
+              🌐
             </div>
-            <span className="hidden sm:inline font-bold text-lg text-neutral-900 dark:text-neutral-100">Intranet</span>
+            <span className="hidden sm:inline font-bold text-xl text-neutral-900 dark:text-neutral-100 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-700">Intranet</span>
           </Link>
 
           {/* Search Bar */}
@@ -38,25 +38,25 @@ export function Navbar() {
           )}
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {isAuthenticated ? (
               <>
                 {/* Nav Links - LinkedIn style */}
                 <Link
                   href="/dashboard"
-                  className="text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium text-sm transition-colors border-b-2 border-transparent hover:border-primary-600"
+                  className="text-neutral-600 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm transition-colors duration-200 pb-2 border-b-2 border-transparent hover:border-blue-600"
                 >
                   🏠 Home
                 </Link>
                 <Link
                   href="/profile"
-                  className="text-neutral-700 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium text-sm transition-colors border-b-2 border-transparent hover:border-primary-600"
+                  className="text-neutral-600 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm transition-colors duration-200 pb-2 border-b-2 border-transparent hover:border-blue-600"
                 >
                   👤 Mi Red
                 </Link>
 
                 {/* Notifications */}
-                <button className="relative p-2 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors">
+                <button className="relative p-2 text-neutral-600 dark:text-neutral-400 hover:bg-blue-50 dark:hover:bg-neutral-700 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors duration-200">
                   🔔
                   <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
                 </button>
@@ -74,7 +74,7 @@ export function Navbar() {
                         className="w-8 h-8 rounded-full object-cover border border-neutral-200 dark:border-neutral-700"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-300 to-primary-600 flex items-center justify-center text-white text-sm font-bold border border-neutral-200 dark:border-neutral-700">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-sm font-bold border-2 border-slate-600 shadow-sm">
                         {user?.username?.charAt(0).toUpperCase() || 'U'}
                       </div>
                     )}

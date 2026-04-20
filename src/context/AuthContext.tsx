@@ -78,6 +78,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     loadUser();
+    
+    // Escuchar evento de sesión perdida (ej: error 401 del API)
+    const handleSessionLost = () => {
+      console.log('⚠️ Sesión perdida detectada - limpiando estado');
+      setUser(null);
+      setIsLoading(false);
+    };
+    
+    window.addEventListener('session-lost', handleSessionLost);
+    return () => window.removeEventListener('session-lost', handleSessionLost);
   }, []);
 
   const login = async (email: string, password: string): Promise<AuthResponse> => {

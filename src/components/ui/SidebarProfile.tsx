@@ -20,9 +20,9 @@ export function SidebarProfile({ user }: SidebarProfileProps) {
   return (
     <div className="space-y-4">
       {/* Profile Card */}
-      <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-cm overflow-hidden border border-neutral-200 dark:border-neutral-700">
+      <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-md overflow-hidden border border-neutral-200 dark:border-neutral-700">
         {/* Header Background */}
-        <div className="h-20 bg-gradient-to-r from-primary-400 to-primary-600" />
+        <div className="h-24 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400" />
 
         {/* Profile Content */}
         <div className="px-6 pb-4">
@@ -32,10 +32,10 @@ export function SidebarProfile({ user }: SidebarProfileProps) {
               <img
                 src={user.avatarUrl || user.avatar}
                 alt={user.username}
-                className="w-20 h-20 rounded-full border-4 border-white dark:border-neutral-800 object-cover shadow-cm"
+                className="w-20 h-20 rounded-full border-4 border-white dark:border-neutral-800 object-cover shadow-lg"
               />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-300 to-primary-600 border-4 border-white dark:border-neutral-800 flex items-center justify-center text-white text-2xl font-bold shadow-cm">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border-4 border-white dark:border-neutral-800 flex items-center justify-center text-white text-2xl font-bold shadow-lg border-slate-600">
                 {user.username?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}

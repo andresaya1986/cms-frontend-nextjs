@@ -41,11 +41,11 @@ class PostsService {
     id: string,
     payload: UpdatePostPayload
   ): Promise<Post> {
-    const response = await apiClient.put(
+    const response = await apiClient.patch(
       endpoints.posts.update(id),
       payload
     );
-    return response.data;
+    return response.data.data || response.data;
   }
 
   /**

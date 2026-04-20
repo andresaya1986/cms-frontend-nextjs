@@ -7,8 +7,8 @@ class CommentsService {
    */
   async getComments(postId: string, page: number = 1, pageSize: number = 10) {
     const response = await apiClient.get(
-      endpoints.comments.list(postId),
-      { params: { page, pageSize } }
+      endpoints.comments.list,
+      { params: { postId, page, pageSize } }
     );
     return response.data;
   }
@@ -21,8 +21,11 @@ class CommentsService {
     payload: CreateCommentPayload
   ): Promise<Comment> {
     const response = await apiClient.post(
-      endpoints.comments.create(postId),
-      payload
+      endpoints.comments.create,
+      {
+        postId,
+        ...payload
+      }
     );
     return response.data;
   }

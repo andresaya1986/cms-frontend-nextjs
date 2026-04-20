@@ -23,18 +23,22 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const loadPost = async () => {
       try {
         setIsLoading(true);
-        console.log('Loading post with slug:', slug);
+        console.log('🔄 Loading post with slug:', slug);
         const data = await postsService.getPostBySlug(slug);
-        console.log('Post data received:', data);
+        console.log('✅ Post data received:', data);
         setPost(data);
+        setError(null);
       } catch (err) {
-        console.error('Error loading post:', err);
-        setError(err instanceof Error ? err.message : 'Error cargando el post');
+        console.error('❌ Error loading post:', err);
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        setError(errorMsg);
+        setPost(null);
       } finally {
         setIsLoading(false);
       }
@@ -85,6 +89,8 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
       setIsSubmittingComment(false);
     }
   };
+
+  console.log('📊 PostDetailClient render:', { slug, isLoading, hasPost: !!post, error });
 
   if (isLoading) {
     return (
@@ -205,11 +211,9 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
 
           {/* Reactions Bar */}
           <ReactionBar
-            likeCount={post.likeCount}
-            commentCount={post.commentCount}
-            onReact={(reaction) => {
-              console.log('Reacted:', reaction);
-            }}
+            postId={post.id}
+            likeCount={post.likeCount ?? post.likesCount ?? 0}
+            commentCount={post.commentCount ?? post.commentsCount ?? 0}
             onComment={() => setShowComments(!showComments)}
           />
 
