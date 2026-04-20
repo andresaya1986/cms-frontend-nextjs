@@ -28,13 +28,21 @@ function SearchPageContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [allResults, setAllResults] = useState<SearchResult[]>([]);
+  const [postsCount, setPostsCount] = useState(0);
+  const [usersCount, setUsersCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'posts' | 'users'>('all');
 
+  // Efecto para buscar cuando cambia el query
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
+      setAllResults([]);
+      setPostsCount(0);
+      setUsersCount(0);
+      setActiveTab('all');
       return;
     }
 
@@ -43,12 +51,20 @@ function SearchPageContent() {
         setLoading(true);
         setError(null);
 
-        // Usar el endpoint unificado /api/v1/search con type parameter
-        const response = await searchService.search(query, activeTab, 50, 1);
-        
-        // Extraer resultados y asignar índice si es necesario
-        const allResults = (response as any).results || [];
-        setResults(allResults as SearchResult[]);
+        // Siempre obtener TODOS los resultados para contar correctamente
+        const allResponse = await searchService.search(query, 'all', 50, 1);
+        const allRes = (allResponse as any).results || [];
+        setAllResults(allRes);
+
+        // Contar por índice
+        const posts = allRes.filter((r: any) => r.index === 'cms_posts').length;
+        const users = allRes.filter((r: any) => r.index === 'cms_users').length;
+        setPostsCount(posts);
+        setUsersCount(users);
+
+        // Mostrar todos en la pestaña "todo" por defecto
+        setResults(allRes);
+        setActiveTab('all');
       } catch (err) {
         console.error('Search error:', err);
         setError('Error en la búsqueda. Intenta de nuevo.');
@@ -58,7 +74,18 @@ function SearchPageContent() {
     };
 
     performSearch();
-  }, [query, activeTab]);
+  }, [query]);
+
+  // Efecto para filtrar resultados cuando cambia la pestaña
+  useEffect(() => {
+    if (activeTab === 'all') {
+      setResults(allResults);
+    } else if (activeTab === 'posts') {
+      setResults(allResults.filter((r: any) => r.index === 'cms_posts'));
+    } else {
+      setResults(allResults.filter((r: any) => r.index === 'cms_users'));
+    }
+  }, [activeTab, allResults]);
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
@@ -99,9 +126,9 @@ function SearchPageContent() {
                   : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
               }`}
             >
-              {tab === 'all' && `📋 Todo (${results.length})`}
-              {tab === 'posts' && `📝 Posts (${results.length})`}
-              {tab === 'users' && `👥 Usuarios (${results.length})`}
+              {tab === 'all' && `📋 Todo (${postsCount + usersCount})`}
+              {tab === 'posts' && `📝 Posts (${postsCount})`}
+              {tab === 'users' && `👥 Usuarios (${usersCount})`}
             </button>
           ))}
         </div>
