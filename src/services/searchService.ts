@@ -3,6 +3,24 @@ import { SearchResult, Post, UserProfile } from '@/types';
 
 class SearchService {
   /**
+   * Búsqueda general (posts y usuarios)
+   */
+  async search(query: string, type: 'all' | 'posts' | 'users' = 'all', limit = 20, page = 1): Promise<SearchResult<any>> {
+    const response = await apiClient.get(
+      endpoints.search.general,
+      {
+        params: {
+          q: query,
+          type,
+          limit,
+          page,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
    * Buscar posts
    */
   async searchPosts(query: string, limit = 10, page = 1): Promise<SearchResult<Post>> {

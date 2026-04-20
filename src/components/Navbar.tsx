@@ -2,14 +2,25 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
 export function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery('');
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-40 bg-gradient-to-r from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-800 shadow-md border-b border-neutral-200 dark:border-neutral-700 backdrop-blur-sm">
@@ -25,16 +36,23 @@ export function Navbar() {
 
           {/* Search Bar */}
           {isAuthenticated && (
-            <div className="hidden md:flex flex-1 max-w-xs mx-6">
+            <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xs mx-6">
               <div className="flex-1 relative">
                 <input
                   type="text"
                   placeholder="Buscar posts, usuarios..."
-                  className="w-full px-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400"
                 />
-                <span className="absolute right-3 top-2.5 text-neutral-400 dark:text-neutral-500">🔍</span>
+                <button
+                  type="submit"
+                  className="absolute right-3 top-2.5 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                >
+                  🔍
+                </button>
               </div>
-            </div>
+            </form>
           )}
 
           {/* Desktop Navigation */}

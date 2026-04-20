@@ -88,6 +88,7 @@ const commentsEndpoints = {
 
 // Endpoints de Búsqueda
 const searchEndpoints = {
+  general: `/${API_VERSION}/search`,
   posts: `/${API_VERSION}/search/posts`,
   users: `/${API_VERSION}/search/users`,
 };
