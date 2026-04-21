@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Post } from '@/types';
+import { PostImages } from '@/components/posts/PostImages';
 import { PostReactionsClient } from './post-reactions-client';
 import { CommentsSection } from './comments-section';
 
@@ -150,6 +151,9 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
               <span>❤️ {post.likeCount ?? post.likesCount ?? 0} reacciones</span>
             </motion.div>
           </div>
+
+          {/* Images */}
+          <PostImages featuredImage={post.featuredImage} media={post.media} />
 
           {/* Content */}
           <motion.div

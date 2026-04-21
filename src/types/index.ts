@@ -152,6 +152,7 @@ export interface UpdatePostPayload {
   metaTitle?: string;
   metaDescription?: string;
   coverImage?: string;
+  featuredImage?: string | null;
   tags?: string[];
   categories?: string[];
 }
