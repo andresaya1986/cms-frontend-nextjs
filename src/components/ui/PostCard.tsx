@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, memo } from 'react';
 import { Post } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { ReactionBar } from './ReactionBar';
 import { CommentForm } from '@/components/posts/CommentForm';
 import { CommentsList } from '@/components/posts/CommentsList';
+import { PostImages } from '@/components/posts/PostImages';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -15,7 +16,7 @@ interface PostCardProps {
   onReact?: (postId: string, reaction: string) => void;
 }
 
-export function PostCard({ post, onDelete, onReact }: PostCardProps) {
+function PostCardComponent({ post, onDelete, onReact }: PostCardProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [showComments, setShowComments] = useState(false);
@@ -169,6 +170,9 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
         )}
       </div>
 
+      {/* Post Images */}
+      <PostImages postId={post.id} />
+
       {/* Single Unified Reaction Bar (like LinkedIn) */}
       <ReactionBar
         postId={post.id}
@@ -193,3 +197,8 @@ export function PostCard({ post, onDelete, onReact }: PostCardProps) {
     </div>
   );
 }
+
+export const PostCard = memo(PostCardComponent, (prev, next) => {
+  // Re-render solo si el post ID cambió
+  return prev.post.id === next.post.id;
+});

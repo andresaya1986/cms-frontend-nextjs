@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { usePosts } from '@/hooks/usePosts';
 import { PostType, PostStatus, PostVisibility } from '@/types';
+import { ImageUpload } from './ImageUpload';
+import { PostImagesUpload } from './PostImagesUpload';
+import { Post } from '@/types';
 
 interface CreatePostFormProps {
   onSuccess?: () => void;
@@ -26,6 +29,8 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [createdPost, setCreatedPost] = useState<Post | null>(null);
+  const [showImagesUpload, setShowImagesUpload] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -69,28 +74,79 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
 
       if (newPost) {
         setSuccess(true);
-        setFormData({
-          title: '',
-          content: '',
-          excerpt: '',
-          featuredImage: '',
-          type: 'ARTICLE',
-          status: 'DRAFT',
-          visibility: 'PUBLIC',
-          metaTitle: '',
-          metaDescription: '',
-          tags: '',
-          categories: '',
-        });
-
-        setTimeout(() => {
-          onSuccess?.();
-        }, 1500);
+        setCreatedPost(newPost);
+        setShowImagesUpload(true);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error creando el post');
     }
   };
+
+  const handleImagesUploaded = () => {
+    setTimeout(() => {
+      setFormData({
+        title: '',
+        content: '',
+        excerpt: '',
+        featuredImage: '',
+        type: 'ARTICLE',
+        status: 'DRAFT',
+        visibility: 'PUBLIC',
+        metaTitle: '',
+        metaDescription: '',
+        tags: '',
+        categories: '',
+      });
+      onSuccess?.();
+    }, 1000);
+  };
+
+  // Si el post fue creado, mostrar el cargador de imágenes
+  if (showImagesUpload && createdPost) {
+    return (
+      <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-md p-8 max-w-4xl mx-auto border border-neutral-200 dark:border-neutral-800">
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-3xl font-bold text-green-600 dark:text-green-400">✓ Post Creado</h2>
+        </div>
+
+        <p className="text-neutral-700 dark:text-neutral-300 mb-6">
+          Tu post "{createdPost.title}" fue creado exitosamente. Ahora puedes agregar imágenes.
+        </p>
+
+        <PostImagesUpload
+          postId={createdPost.id}
+          onImagesUploaded={handleImagesUploaded}
+          label="Agregar imágenes al post"
+        />
+
+        <div className="mt-6 flex gap-4 justify-end">
+          <button
+            onClick={() => {
+              setShowImagesUpload(false);
+              setCreatedPost(null);
+              setFormData({
+                title: '',
+                content: '',
+                excerpt: '',
+                featuredImage: '',
+                type: 'ARTICLE',
+                status: 'DRAFT',
+                visibility: 'PUBLIC',
+                metaTitle: '',
+                metaDescription: '',
+                tags: '',
+                categories: '',
+              });
+              onSuccess?.();
+            }}
+            className="px-6 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-medium transition-colors"
+          >
+            Terminar sin imágenes
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-md p-8 max-w-4xl mx-auto border border-neutral-200 dark:border-neutral-800">
@@ -181,18 +237,15 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2 text-neutral-900 dark:text-neutral-100">Imagen (opcional)</label>
-            <input
-              type="url"
-              name="featuredImage"
-              value={formData.featuredImage}
-              onChange={handleChange}
-              placeholder="URL de la imagen"
-              className="w-full px-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              disabled={isLoading}
+            <ImageUpload
+              onImageSelect={(imageUrl) => {
+                setFormData((prev) => ({ ...prev, featuredImage: imageUrl }));
+              }}
+              label="Subir imagen destacada"
             />
             {formData.featuredImage && (
-              <div className="mt-2 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-700">
-                <img src={formData.featuredImage} alt="Preview" className="w-full h-32 object-cover" onError={() => {}} />
+              <div className="mt-3 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-700">
+                <img src={formData.featuredImage} alt="Preview" className="w-full h-32 object-cover" />
               </div>
             )}
           </div>
@@ -306,7 +359,7 @@ export function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
                 Publicando...
               </span>
             ) : (
-              '✓ Publicar Post'
+              '✓ Crear Post'
             )}
           </button>
         </div>

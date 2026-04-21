@@ -54,6 +54,8 @@ const authEndpoints = {
   refresh: `/${API_VERSION}/auth/refresh`,
   sessions: `/${API_VERSION}/auth/sessions`,
   deleteSession: (sessionId: string) => `/${API_VERSION}/auth/sessions/${sessionId}`,
+  profile: `/${API_VERSION}/auth/profile`,
+  profileAvatar: `/${API_VERSION}/auth/profile/avatar`,
 };
 
 // Endpoints de Posts/Artículos
@@ -64,6 +66,10 @@ const postsEndpoints = {
   getById: (id: string) => `/${API_VERSION}/posts/${id}`,
   update: (id: string) => `/${API_VERSION}/posts/${id}`,
   delete: (id: string) => `/${API_VERSION}/posts/${id}`,
+  // Endpoints de imágenes en posts
+  uploadImages: (id: string) => `/${API_VERSION}/posts/${id}/images`,
+  getImages: (id: string) => `/${API_VERSION}/posts/${id}/images`,
+  deleteImage: (id: string, mediaId: string) => `/${API_VERSION}/posts/${id}/images/${mediaId}`,
 };
 
 // Endpoints de Social (seguir, likes, feed)
@@ -96,6 +102,7 @@ const searchEndpoints = {
 // Endpoints de Media/Archivos
 const mediaEndpoints = {
   upload: `/${API_VERSION}/media/upload`,
+  list: `/${API_VERSION}/media`,
   getById: (id: string) => `/${API_VERSION}/media/${id}`,
   delete: (id: string) => `/${API_VERSION}/media/${id}`,
 };
