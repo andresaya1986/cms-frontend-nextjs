@@ -78,23 +78,17 @@ export function EditPostClient({ post }: EditPostClientProps) {
       setImageError('');
       setIsUploadingImage(true);
 
-      // Subir imagen como featured
-      const formDataToSend = new FormData();
-      formDataToSend.append('file', file);
-      formDataToSend.append('type', 'FEATURED');
-
-      const response = await fetch(`http://localhost:3000/api/v1/posts/${post.id}/upload-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: formDataToSend,
-      });
-
-      if (!response.ok) throw new Error('Error al subir la imagen');
-
-      const data = await response.json();
-      setFeaturedImage(data.data.url || data.data.featuredImage);
+      // Usar postsService para subir la imagen
+      const uploadedImages = await postsService.uploadPostImages(post.id, [file]);
+      
+      if (uploadedImages && uploadedImages.length > 0) {
+        // Obtener la URL de la imagen subida
+        const imageUrl = uploadedImages[0].url;
+        
+        // Actualizar el post con la nueva imagen como featured
+        await postsService.updatePost(post.id, { featuredImage: imageUrl } as any);
+        setFeaturedImage(imageUrl);
+      }
 
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
