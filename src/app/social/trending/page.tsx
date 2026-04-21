@@ -29,4 +29,33 @@ export default function TrendingPage() {
         </div>
 
         {/* Posts con trending hashtags */}
-        <div className=\"md:col-span-2\">\n          {isLoading ? (\n            <div className=\"text-center py-8 text-gray-500\">Loading posts...</div>\n          ) : posts.length === 0 ? (\n            <div className=\"text-center py-8 text-gray-500\">\n              Select a trending hashtag to see related posts\n            </div>\n          ) : (\n            <div className=\"space-y-4\">\n              {posts.map((post) => (\n                <div\n                  key={post.id}\n                  className=\"bg-white rounded-lg p-6 shadow hover:shadow-md transition-shadow cursor-pointer\"\n                  onClick={() => router.push(`/posts/${post.slug}`)}\n                >\n                  <h3 className=\"text-lg font-bold mb-2\">{post.title}</h3>\n                  <p className=\"text-gray-600 line-clamp-2 mb-4\">{post.excerpt}</p>\n                  <div className=\"flex items-center justify-between text-sm text-gray-500\">\n                    <span>By {post.author.displayName || post.author.username}</span>\n                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>\n                  </div>\n                </div>\n              ))}\n            </div>\n          )}\n        </div>\n      </div>\n    </div>\n  );\n}\n
+        <div className="md:col-span-2">
+          {isLoading ? (
+            <div className="text-center py-8 text-gray-500">Loading posts...</div>
+          ) : posts.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              Select a trending hashtag to see related posts
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="bg-white rounded-lg p-6 shadow hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => router.push(`/posts/${post.slug}`)}
+                >
+                  <h3 className="text-lg font-bold mb-2">{post.title}</h3>
+                  <p className="text-gray-600 line-clamp-2 mb-4">{post.excerpt}</p>
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <span>By {post.author.displayName || post.author.username}</span>
+                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -254,22 +254,6 @@ export interface SearchResult<T> {
   query: string;
 }
 
-// ==================== NOTIFICATIONS ====================
-export type NotificationType = 'LIKE' | 'COMMENT' | 'FOLLOW' | 'MENTION' | 'SYSTEM';
-
-export interface Notification {
-  id: string;
-  userId: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  actor?: User;
-  relatedId?: string;
-  isRead: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // ==================== ANALYTICS ====================
 export interface UserAnalytics {
   userId: string;

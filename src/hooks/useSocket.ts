@@ -3,19 +3,31 @@ import { socketService, SocketEventHandlers } from '@/services/socketService';
 import { useAuth } from '@/context/AuthContext';
 
 export function useSocket() {
-  const { user, accessToken } = useAuth();
+  const { user } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
   // Conectar cuando tenga token
   useEffect(() => {
-    if (!accessToken || !user) return;
+    if (!user) return;
 
     const connect = async () => {
       setIsConnecting(true);
       try {
-        await socketService.connect(accessToken);
-        setIsConnected(true);
+        // Obtener token del localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          console.warn('No token found in localStorage');
+          setIsConnecting(false);
+          return;
+        }
+
+        if (!socketService.isConnected()) {
+          await socketService.connect(token);
+          setIsConnected(true);
+        } else {
+          setIsConnected(true);
+        }
       } catch (error) {
         console.error('Failed to connect to WebSocket:', error);
         setIsConnected(false);
@@ -24,17 +36,13 @@ export function useSocket() {
       }
     };
 
-    if (!socketService.isConnected()) {
-      connect();
-    } else {
-      setIsConnected(true);
-    }
+    connect();
 
     // Desconectar cuando se desmonte o cuando no hay usuario
     return () => {
       // No desconectar inmediatamente, mantener la conexión
     };
-  }, [accessToken, user]);
+  }, [user]);
 
   // Hook para escuchar eventos
   const on = useCallback(

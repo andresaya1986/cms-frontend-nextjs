@@ -1,11 +1,11 @@
 import apiClient, { endpoints } from '@/lib/api-client';
-import { Notification, PaginatedResponse } from '@/types';
+import { ExtendedNotification, PaginatedResponse } from '@/types';
 
 class NotificationService {
   /**
    * Listar notificaciones del usuario
    */
-  async list(page = 1, limit = 20): Promise<PaginatedResponse<Notification>> {
+  async list(page = 1, limit = 20): Promise<PaginatedResponse<ExtendedNotification>> {
     const response = await apiClient.get(
       endpoints.notifications.list,
       {
