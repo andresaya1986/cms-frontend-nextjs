@@ -82,6 +82,21 @@ export type PostStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' | 'DELETED';
 export type PostType = 'ARTICLE' | 'NEWS' | 'TUTORIAL' | 'GUIDE';
 export type PostVisibility = 'PUBLIC' | 'PRIVATE' | 'RESTRICTED';
 
+export interface PostMedia {
+  mediaId: string;
+  postId: string;
+  order: number;
+  media: {
+    id: string;
+    filename: string;
+    originalName: string;
+    url: string;
+    thumbnailUrl: string;
+    width: number;
+    height: number;
+  };
+}
+
 export interface Post {
   id: string;
   slug: string;
@@ -96,8 +111,10 @@ export interface Post {
   metaTitle?: string;
   metaDescription?: string;
   coverImage?: string;
+  featuredImage?: string | null;
   tags?: string[];
   categories?: string[];
+  media?: PostMedia[];
   viewCount: number;
   likeCount?: number;
   likesCount?: number;

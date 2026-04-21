@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import api from '@/lib/api-client';
 
 type ReactionType = 'LIKE' | 'LOVE' | 'CARE' | 'HAHA' | 'WOW' | 'SAD' | 'ANGRY';
@@ -25,7 +25,11 @@ const reactions: { type: ReactionType; emoji: string; label: string; color: stri
   { type: 'ANGRY', emoji: '😠', label: 'Angry', color: 'text-red-700' },
 ];
 
-export function ReactionBar({
+// Caché global para reacciones (evita requests duplicadas)
+const reactionCache = new Map<string, { myReaction: ReactionType | null; totalReactions: number; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
+function ReactionBarComponent({
   postId,
   commentId,
   likeCount = 0,
@@ -38,13 +42,26 @@ export function ReactionBar({
   const [myReaction, setMyReaction] = useState<ReactionType | null>(null);
   const [totalReactions, setTotalReactions] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   // Ref para timeout de cierre de popover
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const cacheKeyRef = useRef<string>('');
 
-  // Cargar mi reacción actual y conteos al montar
-  const loadReactionData = async () => {
+  // Cargar mi reacción actual y conteos al montar (con caché)
+  const loadReactionData = useCallback(async () => {
     if (!postId && !commentId) return;
+
+    const cacheKey = postId || commentId || '';
+    cacheKeyRef.current = cacheKey;
+
+    // Verificar caché
+    const cached = reactionCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setMyReaction(cached.myReaction);
+      setTotalReactions(cached.totalReactions);
+      return;
+    }
 
     try {
       const token = localStorage.getItem('auth_token');
@@ -59,7 +76,7 @@ export function ReactionBar({
         `/v1/reactions/my-reaction?${myReactionParams.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMyReaction(myReactionRes.data.data.type || null);
+      const myReactionData = myReactionRes.data.data.type || null;
 
       // Obtener conteos
       const countsParams = new URLSearchParams();
@@ -70,18 +87,31 @@ export function ReactionBar({
         `/v1/reactions/count?${countsParams.toString()}`,
         { headers: {} }
       );
-      setTotalReactions(countsRes.data.data.total || 0);
+      const totalReactionsData = countsRes.data.data.total || 0;
+
+      // Guardar en caché
+      reactionCache.set(cacheKey, {
+        myReaction: myReactionData,
+        totalReactions: totalReactionsData,
+        timestamp: Date.now(),
+      });
+
+      setMyReaction(myReactionData);
+      setTotalReactions(totalReactionsData);
     } catch (error) {
       console.error('Error loading reactions:', error);
     }
-  };
+  }, [postId, commentId]);
 
+  // Solo cargar datos si el usuario hace hover (lazy loading)
   useEffect(() => {
-    loadReactionData();
-  }, [postId, commentId, refreshTrigger]);
+    if (isHovering) {
+      loadReactionData();
+    }
+  }, [isHovering, loadReactionData, refreshTrigger]);
 
   const handleToggleReaction = async (reactionType: ReactionType) => {
-    if (!postId && !commentId || loading) return;
+    if ((!postId && !commentId) || loading) return;
 
     setLoading(true);
     try {
@@ -177,8 +207,14 @@ export function ReactionBar({
         {/* Like/React Button - Facebook style: Click for like, Hold for reactions */}
         <div 
           className="flex-1 relative"
-          onMouseEnter={handleButtonEnter}
-          onMouseLeave={handleButtonLeave}
+          onMouseEnter={() => {
+            setIsHovering(true);
+            handleButtonEnter();
+          }}
+          onMouseLeave={(e) => {
+            setIsHovering(false);
+            handleButtonLeave(e);
+          }}
         >
           <button
             onClick={handleClick}
@@ -240,3 +276,6 @@ export function ReactionBar({
     </div>
   );
 }
+
+// Memoizar el componente para evitar re-renders innecesarios
+export const ReactionBar = memo(ReactionBarComponent);

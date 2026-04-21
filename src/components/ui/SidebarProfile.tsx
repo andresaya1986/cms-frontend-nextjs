@@ -91,7 +91,7 @@ export function SidebarProfile({ user }: SidebarProfileProps) {
       {/* Quick Links */}
       <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-cm border border-neutral-200 dark:border-neutral-700 divide-y divide-neutral-200 dark:divide-neutral-700">
         <Link
-          href="/posts"
+          href="/dashboard"
           className="block px-6 py-3 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 font-medium text-sm transition-colors"
         >
           📝 Mis Posts

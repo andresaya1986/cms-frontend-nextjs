@@ -1,77 +1,55 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import postsService from '@/services/postsService';
-
-interface PostImage {
-  id: string;
-  url: string;
-  thumbnailUrl: string;
-  originalName: string;
-  width: number;
-  height: number;
-}
+import { useState } from 'react';
+import { PostMedia } from '@/types';
 
 interface PostImagesProps {
-  postId: string;
+  featuredImage?: string | null;
+  media?: PostMedia[];
 }
 
-export function PostImages({ postId }: PostImagesProps) {
-  const [images, setImages] = useState<PostImage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+export function PostImages({ featuredImage, media = [] }: PostImagesProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const hasLoadedRef = useRef(false);
 
-  useEffect(() => {
-    // Si ya cargó, no cargar de nuevo
-    if (hasLoadedRef.current) {
-      return;
-    }
-
-    const loadImages = async () => {
-      try {
-        // Cancelar request anterior si existe
-        if (abortControllerRef.current) {
-          abortControllerRef.current.abort();
-        }
-
-        abortControllerRef.current = new AbortController();
-        setIsLoading(true);
-
-        const fetchedImages = await postsService.getPostImages(postId);
-        setImages(Array.isArray(fetchedImages) ? fetchedImages : []);
-        hasLoadedRef.current = true;
-      } catch (err) {
-        // Solo loguear si no es un abort
-        if (err instanceof Error && err.name !== 'AbortError') {
-          console.error('Error cargando imágenes:', err);
-        }
-        setImages([]);
-      } finally {
-        setIsLoading(false);
+  // Combinar featuredImage + media en un único array
+  const allImages = [];
+  
+  // Agregar featuredImage como primera imagen si existe
+  if (featuredImage) {
+    allImages.push({
+      id: 'featured',
+      url: featuredImage,
+      thumbnailUrl: featuredImage,
+      originalName: 'Imagen principal',
+      order: -1,
+    });
+  }
+  
+  // Agregar imágenes del media ordenadas
+  if (media && media.length > 0) {
+    const sortedMedia = [...media].sort((a, b) => (a.order || 0) - (b.order || 0));
+    sortedMedia.forEach((item) => {
+      if (item.media) {
+        allImages.push({
+          id: item.media.id,
+          url: item.media.url,
+          thumbnailUrl: item.media.thumbnailUrl,
+          originalName: item.media.originalName,
+          order: item.order,
+        });
       }
-    };
+    });
+  }
 
-    loadImages();
-
-    // Cleanup
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, [postId]);
-
-  // Si no hay imágenes o está cargando, no mostrar nada
-  if (isLoading || images.length === 0) {
+  // Si no hay imágenes, no mostrar nada
+  if (allImages.length === 0) {
     return null;
   }
 
-  const currentImage = images[currentImageIndex];
+  const currentImage = allImages[currentImageIndex];
 
   // Una sola imagen
-  if (images.length === 1) {
+  if (allImages.length === 1) {
     return (
       <div className="px-6 py-3 bg-neutral-50 dark:bg-neutral-800/50">
         <img
@@ -95,12 +73,14 @@ export function PostImages({ postId }: PostImagesProps) {
         />
 
         {/* Controles de navegación */}
-        {images.length > 1 && (
+        {allImages.length > 1 && (
           <>
             {/* Botón anterior */}
             <button
               onClick={() =>
-                setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+                setCurrentImageIndex((prev) =>
+                  prev === 0 ? allImages.length - 1 : prev - 1
+                )
               }
               className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
               aria-label="Imagen anterior"
@@ -111,7 +91,9 @@ export function PostImages({ postId }: PostImagesProps) {
             {/* Botón siguiente */}
             <button
               onClick={() =>
-                setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+                setCurrentImageIndex((prev) =>
+                  prev === allImages.length - 1 ? 0 : prev + 1
+                )
               }
               className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
               aria-label="Siguiente imagen"
@@ -121,18 +103,18 @@ export function PostImages({ postId }: PostImagesProps) {
 
             {/* Indicador de página */}
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-              {currentImageIndex + 1} / {images.length}
+              {currentImageIndex + 1} / {allImages.length}
             </div>
           </>
         )}
       </div>
 
       {/* Thumbnails */}
-      {images.length > 1 && (
+      {allImages.length > 1 && (
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-          {images.map((img, idx) => (
+          {allImages.map((image, idx) => (
             <button
-              key={img.id}
+              key={image.id}
               onClick={() => setCurrentImageIndex(idx)}
               className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
                 idx === currentImageIndex
@@ -141,7 +123,7 @@ export function PostImages({ postId }: PostImagesProps) {
               }`}
             >
               <img
-                src={img.thumbnailUrl}
+                src={image.thumbnailUrl}
                 alt={`Thumbnail ${idx + 1}`}
                 className="w-full h-full object-cover"
               />

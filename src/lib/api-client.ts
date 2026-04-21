@@ -10,7 +10,16 @@ const apiClient = axios.create({
   },
 });
 
-// Interceptor para incluir el JWT en las peticiones [cite: 41, 71]
+// ==================== REQUEST DEDUPLICATION ====================
+// Evitar requests duplicados que se hagan simultáneamente (ej: ReactionBar × 8 posts)
+const pendingRequests = new Map<string, Promise<any>>();
+
+function generateRequestKey(config: any): string {
+  // Clave única basada en método, URL y params
+  return `${config.method?.toUpperCase()}:${config.url}:${JSON.stringify(config.params || {})}`;
+}
+
+// Interceptor para incluir el JWT en las peticiones
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('auth_token');
   if (token) {
@@ -19,10 +28,21 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor para manejo de errores
+// Interceptor para deduplicación de requests GET
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Limpiar la clave del request pendiente después de completarse
+    const key = generateRequestKey(response.config);
+    pendingRequests.delete(key);
+    return response;
+  },
   (error) => {
+    // Limpiar incluso en error
+    if (error.config) {
+      const key = generateRequestKey(error.config);
+      pendingRequests.delete(key);
+    }
+    
     if (error.response?.status === 401) {
       // No autenticado, limpiar sesión completamente
       localStorage.removeItem('auth_token');
@@ -36,6 +56,24 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Wrapper para deduplicar GET requests
+const originalGet = apiClient.get;
+apiClient.get = function(this: any, url: string, config?: any) {
+  const fullConfig = { ...config, url, method: 'GET' };
+  const key = generateRequestKey(fullConfig);
+  
+  // Si ya hay un request pendiente con la misma clave, retornar la promise existente
+  if (pendingRequests.has(key)) {
+    return pendingRequests.get(key)!;
+  }
+  
+  // Crear un nuevo request y almacenarlo
+  const promise = originalGet.call(this, url, config);
+  pendingRequests.set(key, promise);
+  
+  return promise;
+} as typeof apiClient.get;
 
 // ==================== ENDPOINTS ====================
 const API_VERSION = appConfig.api.version;

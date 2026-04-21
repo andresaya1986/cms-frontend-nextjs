@@ -12,6 +12,19 @@ export default function DashboardPage() {
   const { posts, isLoading, fetchPosts, loadMorePosts, hasMore } = usePosts();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
+  
+  // Refs para mantener los últimos valores de hasMore e isLoading
+  const hasMoreRef = useRef(hasMore);
+  const isLoadingRef = useRef(isLoading);
+
+  // Actualizar los refs cuando cambien los valores
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
 
   // Cargar posts iniciales
   useEffect(() => {
@@ -22,7 +35,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
+        // Usar refs para evitar capturar valores obsoletos
+        if (entries[0].isIntersecting && hasMoreRef.current && !isLoadingRef.current) {
           loadMorePosts();
         }
       },
@@ -38,7 +52,7 @@ export default function DashboardPage() {
         observer.unobserve(observerTarget.current);
       }
     };
-  }, [loadMorePosts, hasMore, isLoading]);
+  }, [loadMorePosts]);
 
   // Renderizar el feed del dashboard: SidebarProfile + Feed central + TrendingCard
   return (

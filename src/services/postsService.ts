@@ -95,7 +95,9 @@ class PostsService {
       }
     );
 
-    return response.data.data || response.data;
+    const data = response.data.data || response.data;
+    // Asegurar que siempre se retorna un array (cuando es una sola imagen, el backend puede retornar un objeto)
+    return Array.isArray(data) ? data : [data];
   }
 
   /**

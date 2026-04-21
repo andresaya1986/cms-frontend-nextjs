@@ -39,7 +39,7 @@ export default function ProfilePage() {
         {/* Avatar Upload */}
         <div className="pb-8 border-b border-neutral-200 dark:border-neutral-700">
           <ProfileAvatarUpload
-            currentAvatar={user?.avatar}
+            currentAvatar={user?.avatarUrl || user?.avatar}
             onUploadSuccess={(avatarUrl) => {
               console.log('Avatar actualizado:', avatarUrl);
             }}

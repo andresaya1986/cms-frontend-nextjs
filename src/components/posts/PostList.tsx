@@ -2,6 +2,7 @@
 
 import { Post } from '@/types';
 import { PostCard } from '../ui/PostCard';
+import { memo } from 'react';
 
 interface PostListProps {
   posts: Post[];
@@ -10,7 +11,7 @@ interface PostListProps {
   onReact?: (postId: string, reaction: string) => void;
 }
 
-export function PostList({ posts, isLoading, onDeletePost, onReact }: PostListProps) {
+function PostListComponent({ posts, isLoading, onDeletePost, onReact }: PostListProps) {
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -45,3 +46,6 @@ export function PostList({ posts, isLoading, onDeletePost, onReact }: PostListPr
     </div>
   );
 }
+
+// Memoizar para evitar re-renders cuando los posts no cambian
+export const PostList = memo(PostListComponent);

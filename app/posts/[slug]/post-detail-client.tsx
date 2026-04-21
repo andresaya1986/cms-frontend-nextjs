@@ -7,6 +7,7 @@ import postsService from '@/services/postsService';
 import commentsService from '@/services/commentsService';
 import { useAuth } from '@/context/AuthContext';
 import { ReactionBar } from '@/components/ui/ReactionBar';
+import { PostImages } from '@/components/posts/PostImages';
 import { formatDate } from '@/lib/date-utils';
 
 interface PostDetailClientProps {
@@ -184,6 +185,9 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
               <span>💬 {post.commentCount} comentarios</span>
             </div>
           </div>
+
+          {/* Images */}
+          <PostImages featuredImage={post.featuredImage} media={post.media} />
 
           {/* Content */}
           <div className="px-6 sm:px-8 py-8 prose dark:prose-invert max-w-none">

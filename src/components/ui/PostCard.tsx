@@ -171,7 +171,7 @@ function PostCardComponent({ post, onDelete, onReact }: PostCardProps) {
       </div>
 
       {/* Post Images */}
-      <PostImages postId={post.id} />
+      <PostImages featuredImage={post.featuredImage} media={post.media} />
 
       {/* Single Unified Reaction Bar (like LinkedIn) */}
       <ReactionBar

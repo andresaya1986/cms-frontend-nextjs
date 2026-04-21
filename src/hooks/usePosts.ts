@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Post } from '@/types';
 import postsService from '@/services/postsService';
 
@@ -20,9 +20,11 @@ export function usePosts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [pageSize] = useState(10);
+  
+  // Usar refs para mantener estado sin causar reconstrucción de funciones
+  const currentPageRef = useRef(1);
+  const pageSizeRef = useRef(10);
 
   const fetchPosts = useCallback(async (page = 1, newPageSize = 10) => {
     setIsLoading(true);
@@ -35,7 +37,8 @@ export function usePosts() {
         ? postsList.map(transformPost)
         : [transformPost(postsList)];
       setPosts(transformedPosts);
-      setCurrentPage(page);
+      currentPageRef.current = page;
+      pageSizeRef.current = newPageSize;
       // Determinar si hay más posts
       setHasMore(transformedPosts.length === newPageSize);
     } catch (err) {
@@ -47,12 +50,15 @@ export function usePosts() {
 
   // Cargar más posts (para infinite scroll)
   const loadMorePosts = useCallback(async () => {
-    if (!hasMore || isLoading) return;
+    // Guard: si ya estamos cargando, no hagas nada
+    if (isLoading) return;
     
     setIsLoading(true);
     setError(null);
     try {
-      const nextPage = currentPage + 1;
+      const nextPage = currentPageRef.current + 1;
+      const pageSize = pageSizeRef.current;
+      
       const data = await postsService.getPostsList(nextPage, pageSize);
       const postsList = data.data || data;
       const transformedPosts = Array.isArray(postsList)
@@ -60,14 +66,14 @@ export function usePosts() {
         : [transformPost(postsList)];
       
       setPosts((prev) => [...prev, ...transformedPosts]);
-      setCurrentPage(nextPage);
+      currentPageRef.current = nextPage;
       setHasMore(transformedPosts.length === pageSize);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading more posts');
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, hasMore, isLoading, pageSize]);
+  }, [isLoading]);
 
   const getPost = useCallback(async (slug: string) => {
     setIsLoading(true);
@@ -139,6 +145,5 @@ export function usePosts() {
     deletePost,
     loadMorePosts,
     hasMore,
-    currentPage,
   };
 }

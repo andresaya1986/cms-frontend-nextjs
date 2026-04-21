@@ -10,7 +10,7 @@ interface ProfileAvatarUploadProps {
 }
 
 export function ProfileAvatarUpload({ currentAvatar, onUploadSuccess }: ProfileAvatarUploadProps) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +49,10 @@ export function ProfileAvatarUpload({ currentAvatar, onUploadSuccess }: ProfileA
       // El backend retorna { user, url }
       const avatarUrl = response.url || response.user?.avatarUrl;
       setPreviewUrl(avatarUrl);
+      
+      // Refrescar el usuario en el contexto para actualizar el avatar en toda la app
+      await refreshUser();
+      
       onUploadSuccess?.(avatarUrl);
 
       // Resetear input
