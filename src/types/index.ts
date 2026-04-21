@@ -300,3 +300,208 @@ export interface PaginatedResponse<T> {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
+
+// ==================== REACTIONS ====================
+export type ReactionType = 'LIKE' | 'LOVE' | 'CARE' | 'HAHA' | 'WOW' | 'SAD' | 'ANGRY';
+
+export interface Reaction {
+  id: string;
+  userId: string;
+  targetId: string;
+  targetType: 'POST' | 'COMMENT';
+  type: ReactionType;
+  createdAt: string;
+}
+
+export interface ReactionStats {
+  LIKE: number;
+  LOVE: number;
+  CARE: number;
+  HAHA: number;
+  WOW: number;
+  SAD: number;
+  ANGRY: number;
+  total: number;
+  userReaction?: ReactionType | null;
+}
+
+export interface CreateReactionPayload {
+  targetId: string;
+  targetType: 'POST' | 'COMMENT';
+  type: ReactionType;
+}
+
+// ==================== HASHTAGS ====================
+export interface Hashtag {
+  id: string;
+  name: string;
+  description?: string;
+  count: number;
+  trendingScore?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HashtagStats {
+  hashtag: Hashtag;
+  postsCount: number;
+  trendingRank?: number;
+}
+
+// ==================== MENTIONS ====================
+export type MentionType = 'POST_MENTION' | 'COMMENT_MENTION';
+
+export interface Mention {
+  id: string;
+  type: MentionType;
+  title: string;
+  body: string;
+  mentioningUser: User;
+  postId?: string;
+  commentId?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+// ==================== BOOKMARKS ====================
+export interface Bookmark {
+  id: string;
+  userId: string;
+  postId: string;
+  post: Post;
+  createdAt: string;
+}
+
+export interface CreateBookmarkPayload {
+  postId: string;
+}
+
+// ==================== SHARES ====================
+export interface Share {
+  id: string;
+  userId: string;
+  postId: string;
+  message?: string;
+  user: User;
+  createdAt: string;
+}
+
+export interface CreateSharePayload {
+  postId: string;
+  message?: string;
+}
+
+// ==================== SOCIAL EXTENSIONS ====================
+export interface UserSuggestion {
+  id: string;
+  user: User;
+  mutualFollowers?: number;
+  reason?: string;
+}
+
+export interface FollowerInfo {
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+  bio?: string;
+  isFollowing?: boolean;
+}
+
+export interface FollowResponse {
+  isFollowing: boolean;
+  followerCount: number;
+}
+
+// ==================== EXTENDED NOTIFICATIONS ====================
+export type NotificationType = 
+  | 'NEW_FOLLOWER' 
+  | 'POST_LIKE' 
+  | 'NEW_COMMENT' 
+  | 'COMMENT_LIKE' 
+  | 'POST_MENTION' 
+  | 'COMMENT_MENTION' 
+  | 'POST_SHARE' 
+  | 'SYSTEM';
+
+export interface ExtendedNotification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  data?: Record<string, any>;
+  actor?: User;
+  relatedId?: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ==================== WEBSOCKET EVENTS ====================
+export interface SocketMessage<T = any> {
+  event: string;
+  data: T;
+  timestamp: string;
+}
+
+export interface FollowerEvent {
+  follower: User;
+  followerCount: number;
+  timestamp: string;
+}
+
+export interface ReactionEvent {
+  userId: string;
+  username: string;
+  postId: string;
+  type: ReactionType;
+  timestamp: string;
+}
+
+export interface ReactionRemovedEvent {
+  userId: string;
+  postId: string;
+  oldType: ReactionType;
+  timestamp: string;
+}
+
+export interface PostCountersEvent {
+  postId: string;
+  reactionsCount: number;
+  commentsCount: number;
+  sharesCount: number;
+  bookmarksCount: number;
+  viewCount: number;
+  timestamp: string;
+}
+
+export interface CommentEvent {
+  userId: string;
+  username: string;
+  postId: string;
+  commentId: string;
+  timestamp: string;
+}
+
+export interface TypingEvent {
+  userId: string;
+  username: string;
+  postId: string;
+}
+
+export interface UserPresenceEvent {
+  userId: string;
+  username: string;
+  timestamp: string;
+}
+
+export interface MentionEvent {
+  type: MentionType;
+  title: string;
+  body: string;
+  mentioningUser: User;
+  postId?: string;
+  commentId?: string;
+  timestamp: string;
+}

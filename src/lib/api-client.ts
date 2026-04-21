@@ -118,8 +118,37 @@ const socialEndpoints = {
   unlike: `/${API_VERSION}/social/like`,
   feed: `/${API_VERSION}/social/feed`,
   getUserProfile: (username: string) => `/${API_VERSION}/social/users/${username}`,
-  getUserFollowers: (username: string) => `/${API_VERSION}/social/users/${username}/followers`,
-  getUserFollowing: (username: string) => `/${API_VERSION}/social/users/${username}/following`,
+  getUserFollowers: (username: string) => `/${API_VERSION}/social/users/${username}/followers?limit=20&offset=0`,
+  getUserFollowing: (username: string) => `/${API_VERSION}/social/users/${username}/following?limit=20&offset=0`,
+  search: `/${API_VERSION}/social/search`,
+  searchAdvanced: `/${API_VERSION}/social/search/advanced`,
+  suggestions: `/${API_VERSION}/social/suggestions`,
+  bookmarks: `/${API_VERSION}/social/bookmarks`,
+  bookmarkPost: (postId: string) => `/${API_VERSION}/social/bookmarks/${postId}`,
+  shares: (postId: string) => `/${API_VERSION}/posts/${postId}/shares`,
+  sharePost: (postId: string) => `/${API_VERSION}/social/shares/${postId}`,
+};
+
+// Endpoints de Reactions
+const reactionsEndpoints = {
+  create: `/${API_VERSION}/reactions`,
+  list: `/${API_VERSION}/reactions`,
+  stats: `/${API_VERSION}/reactions/stats`,
+};
+
+// Endpoints de Hashtags
+const hashtagsEndpoints = {
+  search: `/${API_VERSION}/social/hashtags/search`,
+  trending: `/${API_VERSION}/social/hashtags/trending`,
+  getByName: (tagName: string) => `/${API_VERSION}/social/hashtags/${tagName}`,
+  stats: (tagName: string) => `/${API_VERSION}/social/hashtags/${tagName}/stats`,
+};
+
+// Endpoints de Mentions
+const mentionsEndpoints = {
+  list: `/${API_VERSION}/social/mentions`,
+  received: `/${API_VERSION}/social/mentions/received`,
+  markAsRead: (mentionId: string) => `/${API_VERSION}/social/mentions/${mentionId}/read`,
 };
 
 // Endpoints de Comentarios
@@ -175,6 +204,9 @@ export const endpoints = {
   notifications: notificationsEndpoints,
   analytics: analyticsEndpoints,
   health: healthEndpoints,
+  reactions: reactionsEndpoints,
+  hashtags: hashtagsEndpoints,
+  mentions: mentionsEndpoints,
 };
 
 export default apiClient;

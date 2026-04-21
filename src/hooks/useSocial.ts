@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { UserProfile } from '@/types';
+import { UserProfile, FollowerInfo, UserSuggestion } from '@/types';
 import socialService from '@/services/socialService';
 
 export function useSocial() {
@@ -80,6 +80,59 @@ export function useSocial() {
     }
   }, []);
 
+  const getFollowers = useCallback(async (username: string, limit = 20, offset = 0) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      return await socialService.getFollowers(username, limit, offset);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching followers');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const getFollowing = useCallback(async (username: string, limit = 20, offset = 0) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      return await socialService.getFollowing(username, limit, offset);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching following');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const searchUsers = useCallback(async (q: string, limit = 20, offset = 0) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      return await socialService.searchUsers(q, limit, offset);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error searching users');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const getUserSuggestions = useCallback(async (limit = 10): Promise<UserSuggestion[] | null> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await socialService.getUserSuggestions(limit);
+      return data.suggestions;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching suggestions');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     isLoading,
     error,
@@ -89,5 +142,9 @@ export function useSocial() {
     unlikePost,
     getFeed,
     getUserProfile,
+    getFollowers,
+    getFollowing,
+    searchUsers,
+    getUserSuggestions,
   };
 }
