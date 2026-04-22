@@ -16,7 +16,7 @@ function parseAuthError(err: any): ErrorType {
   const errorObj = err as any;
   const status = errorObj?.response?.status;
   const data = errorObj?.response?.data;
-  const message = data?.message || data?.error || '';
+  const message = (data?.message || data?.error || '').toString().toLowerCase();
 
   // Error 429: Demasiados intentos
   if (status === 429) {
@@ -30,25 +30,25 @@ function parseAuthError(err: any): ErrorType {
   // Error 401: No autenticado
   if (status === 401) {
     // Tratar de diferenciar entre usuario no existe vs contraseña incorrecta
-    if (message.toLowerCase().includes('not found') || message.toLowerCase().includes('no existe')) {
+    if (message.includes('not found') || message.includes('no existe')) {
       return {
         type: 'user_not_found',
         message: 'No encontramos una cuenta con este correo',
-        suggestion: '¿No tienes cuenta? Puedes registrarte aquí. Si crees que es un error, intenta con otro correo.',
+        suggestion: 'Verifica que el correo sea correcto o intenta registrarte.',
       };
     }
-    if (message.toLowerCase().includes('password') || message.toLowerCase().includes('contraseña')) {
+    if (message.includes('password') || message.includes('contraseña')) {
       return {
         type: 'invalid_password',
         message: 'Contraseña incorrecta',
-        suggestion: '¿Olvidaste tu contraseña? Puedes resetearla aquí.',
+        suggestion: '¿Olvidaste tu contraseña? Puedes resetearla abajo.',
       };
     }
     // Por defecto para 401
     return {
       type: 'invalid_password',
       message: 'Email o contraseña incorrectos',
-      suggestion: '¿Olvidaste tu contraseña? Puedes resetearla aquí.',
+      suggestion: '¿Olvidaste tu contraseña? Puedes resetearla abajo.',
     };
   }
 
@@ -156,26 +156,6 @@ export function LoginForm() {
                 <p className="text-red-700 text-sm mt-1">{error.suggestion}</p>
               )}
             </div>
-          </div>
-
-          {/* Acciones sugeridas */}
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-red-200">
-            {(error.type === 'invalid_password' || error.type === 'too_many_attempts') && (
-              <Link
-                href="/auth/forgot-password"
-                className="text-sm text-red-700 hover:text-red-900 underline font-medium"
-              >
-                Recuperar contraseña →
-              </Link>
-            )}
-            {error.type === 'user_not_found' && (
-              <Link
-                href="/auth/register"
-                className="text-sm text-red-700 hover:text-red-900 underline font-medium"
-              >
-                Registrarse aquí →
-              </Link>
-            )}
           </div>
         </div>
       )}
